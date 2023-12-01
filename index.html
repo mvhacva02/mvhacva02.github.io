@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study English</title>
+    <!-- <link rel="stylesheet" href="https://d35aaqx5ub95lt.cloudfront.net/css/8273-c90f884e.css"> -->
+    <style>
+        @font-face {
+            font-family: font-en;
+            src: url(font-en.woff2);
+        }
+        @font-face {
+            font-family: font-vi;
+            src: url(font-vi.woff2);
+        }
+        *{
+            font-family: font-en, font-vi;
+        }
+        body{
+            padding: 0 20px;
+        }
+        .box-question{
+            border: 2px solid rgb(175, 175, 175);
+            border-radius: 16px;
+            padding: 5px;
+            color: rgb(75, 75, 75);
+            font-size: 24px;
+        }
+        .box-answer{
+            outline: none;
+            border: none;
+            border-bottom: 2px solid rgb(175, 175, 175);
+            padding: 5px;
+            color: rgb(75, 75, 75);
+            font-size: 24px;
+        }
+        .space{
+            font-size: 24px;
+        }
+        #box_answer>*{
+            margin-bottom: 20px;
+        }
+        
+    </style>
+    <style>
+        .bottom{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        .bg-success{background-color: rgb(215, 255, 184)}
+        .bg-danger{background-color: rgb(255, 223, 224)}
+        .text-success{color: rgb(88, 167, 0)}
+        .text-danger{color: rgb(234, 43, 43)}
+        .p-0{padding: 0px}
+        .p-1{padding: 4px}
+        .p-2{padding: 8px}
+        .p-3{padding: 12px}
+        .p-4{padding: 16px}
+        .p-5{padding: 20px}
+        .mb-2{margin-bottom: 8px}
+        .mb-5{margin-bottom: 20px}
+        .mt-0{margin-top: 0}
+        .mt-5{margin-top: 20px}
+
+        .fs-4{
+            font-weight: 500;
+        }
+        .btn-success{
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            min-width: 150px;
+            line-height: 24px;
+
+            background: rgb(58, 131, 1);
+            padding: 0;
+            cursor: pointer;
+            outline-offset: 4px;
+            width: 100%;
+        }
+        .btn-success > span {
+            display: block;
+            padding: 12px 42px;
+            border-radius: 12px;
+            background: rgb(88,204,2);
+            color: white;
+            transform: translateY(-6px);
+        }
+        .btn-success:active > span {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger{
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            min-width: 150px;
+            line-height: 24px;
+
+            background: rgb(234,43,43);
+            padding: 0;
+            cursor: pointer;
+            outline-offset: 4px;
+            width: 100%;
+        }
+        .btn-danger > span {
+            display: block;
+            padding: 12px 42px;
+            border-radius: 12px;
+            background: rgb(255,75,75);
+            color: white;
+            transform: translateY(-6px);
+        }
+        .btn-danger:active > span {
+            transform: translateY(-2px);
+        }
+
+        .hide{display: none}
+
+      </style>
+</head>
+<body>
+    <h1>Cách học ngôn ngữ miễn phí, vui nhộn và hiệu quả!</h1>
+    <br>
+    <div class="challenge-header">
+        <h1>Viết lại bằng Tiếng Việt</h1>
+    </div>
+    <div style="margin-bottom: 20px;" id="box_answer">
+        <span d="line" class="box-question" id="q_en"></span>
+        <span d="line" class="space"> : </span>
+        <input id="answer" class="box-answer" type="text" placeholder="Nhập câu trả lời">
+    </div>
+    <div class="bottom">
+        <!-- <div class="p-5 bg-success">
+            <h2 class="text-success mb-2 mt-0">Tuyệt vời!</h2>
+            <div class="text-success hide"></div>
+            <button class="btn-success mt-5" id="btn_send_answer"><span>Tiếp tục</span></button>
+        </div>
+        <div class="p-5 bg-danger">
+            <h2 class="text-danger mb-2 mt-0">Đáp án đúng:</h2>
+            <div class="text-danger" id="text-right">Yes, I am from Vietnam.</div>
+            <button class="btn-danger mt-5" id="btn_send_answer"><span>Tiếp tục</span></button>
+        </div> -->
+        <div class="p-5">
+            <h2 class="text-success mb-2 mt-0 hide"></h2>
+            <div class="text-success hide"></div>
+            <button class="btn-success mt-5" id="btn_send_answer"><span>Kiểm tra</span></button>
+        </div>
+    </div>
+
+
+    <script src="load.js"></script>
+    <script>
+        answer.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              btn_send_answer.click();
+            }
+        });
+        STATE = {
+            DEFAULT: "hide",
+            SUCCESS: "success",
+            ERROR: "danger"
+        }
+        function set_state(state = STATE.DEFAULT, title = "Tuyệt vời!", description = "", btn_text = "Tiếp tục"){
+            const box_ele = document.querySelector(".bottom>div");
+            const title_element = document.querySelector(".bottom>div>h2");
+            const description_ele = document.querySelector(".bottom>div>div");
+            const btn_element = document.querySelector(".bottom>div>button");
+            title_element.innerHTML = title;
+            description_ele.innerHTML = description;
+            btn_element.querySelector('span').innerHTML = btn_text;
+
+            // Xóa thuộc tính cũ
+            [box_ele, title_element, description_ele, btn_element].forEach(e=>e.classList.remove(...['bg-danger', 'bg-success', 'btn-success', 'btn-danger', 'text-success', 'text-danger', 'hide']));
+            switch(state){
+                case STATE.SUCCESS: {
+                    box_ele.classList.add("bg-success");
+                    title_element.classList.add('text-success');
+                    description_ele.classList.add('text-success');
+                    btn_element.classList.add('btn-success');
+                    break;
+                }
+                case STATE.ERROR: {
+                    box_ele.classList.add("bg-danger");
+                    title_element.classList.add('text-danger');
+                    description_ele.classList.add('text-danger');
+                    btn_element.classList.add('btn-danger');
+                    break;
+                }
+                default: {
+                    title_element.classList.add('hide');
+                    description_ele.classList.add('hide');
+                    btn_element.classList.add('btn-success');
+                    break;
+                }
+            }
+        }
+    
+        function next_question(){
+            answer.value = "";
+            set_state(STATE.DEFAULT, title="", description="", btn_text="Kiểm tra");
+            const keys = Object.keys(data);
+            q_en.innerHTML = keys[parseInt(Math.random()*keys.length)];
+            
+            console.log(data[q_en.innerHTML]);
+
+            // Sửa lại độ dài thanh input
+            document.querySelector("#box_answer .box-answer").style.maxWidth = document.querySelector("#box_answer").offsetWidth - Array.from(document.querySelectorAll("#box_answer [d]")).map(e=>e.offsetWidth).reduce((old, new_val)=>{return old + new_val}, 25) + "px";
+        }
+        var retrial = 1;
+        btn_send_answer.onclick = function(){
+            if(this.innerText == "Kiểm tra"){
+                const key = q_en.innerHTML;
+                const regex = /[^\wÀ-ỹ]/g;
+                const origin = data[key].replaceAll(regex, '');
+                const answer_user = answer.value.replaceAll(regex, '')
+                if(answer_user.length > 1 && origin.includes(answer_user.toLowerCase())){
+                    // Đúng
+                    set_state(STATE.SUCCESS, title="Tuyệt vời!", description=data[key], btn_text="Tiếp tục");
+                }
+                else{
+                    // Sai
+                    if(retrial-- > 0){
+                        set_state(STATE.ERROR, title="Hmm, thử lại lần nữa nhé", description="", btn_text="OK");
+                    }
+                    else{
+                        set_state(STATE.ERROR, title="Đáp án đúng:", description=data[key], btn_text="Tiếp tục");
+                    }
+                }
+            }
+            else if(this.innerText == "Tiếp tục"){
+                next_question();
+                retrial = 1;
+            }
+            else{
+                set_state(STATE.DEFAULT, title="", description="", btn_text="Kiểm tra");
+            }
+        }
+        setTimeout(()=>{
+            next_question();
+        }, 500)
+    
+    </script>
+</body>
+</html>
