@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study English</title>
+    <title>TEST</title>
     <!-- <link rel="stylesheet" href="https://d35aaqx5ub95lt.cloudfront.net/css/8273-c90f884e.css"> -->
     <style>
         @font-face {
@@ -151,6 +151,8 @@
         </div>
     </div>
 
+    <br><br><br>
+    <a href="study.html">Học từ mới</a>
 
     <script src="load.js"></script>
     <script>
@@ -203,14 +205,68 @@
         function next_question(){
             answer.value = "";
             set_state(STATE.DEFAULT, title="", description="", btn_text="Kiểm tra");
-            const keys = Object.keys(data);
-            q_en.innerHTML = keys[parseInt(Math.random()*keys.length)];
-            
-            console.log(data[q_en.innerHTML]);
+            const obj_question = get_fit_question();
+            q_en.innerHTML = obj_question.en;
+            console.log(JSON.stringify(obj_question));
 
             // Sửa lại độ dài thanh input
             document.querySelector("#box_answer .box-answer").style.maxWidth = document.querySelector("#box_answer").offsetWidth - Array.from(document.querySelectorAll("#box_answer [d]")).map(e=>e.offsetWidth).reduce((old, new_val)=>{return old + new_val}, 25) + "px";
         }
+        
+        function get_fit_question(){
+            const all_question = get_learned_words();
+
+            if(Object.keys(all_question).length == 0){
+                throw new Error("Bạn chưa học từ mới nào hết");
+            }
+
+            // Tìm câu hỏi chưa trả lời lần nào
+            const question_yet_answer = all_question.filter(item=>item.right_answer + item.wrong_answer == 0);
+            if(question_yet_answer.length){
+                return question_yet_answer[Math.floor(Math.random()*question_yet_answer.length)]
+            }
+
+            // Tìm câu hỏi chưa trả lời đúng lần nào
+            const question_yet_right_answer = all_question.filter(item=>item.right_answer == 0);
+            if(question_yet_right_answer.length){
+                return question_yet_right_answer[Math.floor(Math.random()*question_yet_right_answer.length)]
+            }
+
+            // Tìm câu hỏi tỉ lệ đúng/sai<2
+            const questions_fit_true_false = all_question.filter(item=>item.right_answer/item.wrong_answer < 2);
+            if(questions_fit_true_false.length){
+                return questions_fit_true_false[Math.floor(Math.random()*questions_fit_true_false.length)]
+            }
+
+            // trả về câu hỏi ngẫu nhiên
+            return all_question[Math.floor(Math.random()*all_question.length)]
+        }
+
+        function get_learned_words(){
+            // [{...}, {...}]
+            // {en: "EN", vi: "VI", time: 0.1}
+            return JSON.parse(localStorage?.learned_words ?? '[]');
+        }
+        
+        function set_learned_words(obj){
+            localStorage.setItem("learned_words", JSON.stringify(obj));
+        }
+        
+        function update_learned_words(en, right_answer = false){
+            const all_question = get_learned_words();
+            const index = all_question.findIndex(item=>item.en == en);
+            if(index == -1){
+                throw new Error("Lỗi cập nhật dữ liệu");
+            }
+            if(right_answer){
+                all_question[index].right_answer += 1;
+            }
+            else{
+                all_question[index].wrong_answer += 0.5;
+            }
+            set_learned_words(all_question);
+        }
+
         var retrial = 1;
         btn_send_answer.onclick = function(){
             if(this.innerText == "Kiểm tra"){
@@ -218,9 +274,12 @@
                 const regex = /[^\wÀ-ỹ]/g;
                 const origin = data[key].replaceAll(regex, '');
                 const answer_user = answer.value.replaceAll(regex, '')
+                
                 if(answer_user.length > 1 && origin.includes(answer_user.toLowerCase())){
                     // Đúng
                     set_state(STATE.SUCCESS, title="Tuyệt vời!", description=data[key], btn_text="Tiếp tục");
+                    update_learned_words(en=key, right_answer = true);
+                    play_sound(sound = true);
                 }
                 else{
                     // Sai
@@ -230,6 +289,8 @@
                     else{
                         set_state(STATE.ERROR, title="Đáp án đúng:", description=data[key], btn_text="Tiếp tục");
                     }
+                    update_learned_words(en=key, right_answer = false);
+                    play_sound(sound = false);
                 }
             }
             else if(this.innerText == "Tiếp tục"){
@@ -241,7 +302,13 @@
             }
         }
         setTimeout(()=>{
-            next_question();
+            try{
+                next_question();
+            }
+            catch{
+                console.log("Chưa có từ mới nào");
+                document.querySelector("a[href='study.html']").click();
+            }
         }, 500)
     
     </script>

@@ -1,0 +1,41 @@
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const div = document.createElement("div");
+div.innerHTML = `
+<div style="position: fixed; top: 0; left: 0;">
+    <input type="text" id="token" name="token" placeholder="token" value="79005386f4e26a1113994a79f89db3fc"><br>
+    <input type="text" id="code" name="code" placeholder="code" value="LW32CGH3ZSUZ7JEU"><br>
+    <input type="text" id="visitorId" name="visitorId" placeholder="visitorId" value="fdbd581fbaeec99d8eb21fe0b6ae61f4"><br>
+    <input type="text" id="name_player" name="name_player" placeholder="name_player" value="Chỗ Đứng Cao Quá, Top 2 Nhìn Gần Cũng Không Thấy"><br>
+    <input type="text" id="score" name="score" placeholder="score" value="0"><br>
+    <button id="btnUP" style="width: 100%;">UP</button>
+</div>`
+document.body.appendChild(div);
+document.querySelector("#btnUP").onclick = btnUPonclick;
+async function btnUPonclick(){
+    const new_score = parseInt(score.value) + 50;
+    try{
+        const controller = new AbortController();
+        setTimeout(()=>{controller.abort()},500);
+        const res = await (await fetch("https://azapp.vn/kichitrunglon12/home/updateGame", {
+            "signal": controller.signal,        
+            "headers": {"content-type": "application/x-www-form-urlencoded; charset=UTF-8"},
+                "body": "token="+token.value+"&code="+code.value+"&score="+new_score+"&visitorId="+visitorId.value,
+                "method": "POST",
+            })).json();
+        if(res.success){
+            score.value = new_score;
+        }
+        else{
+            score.value = new_score - 50;
+        }
+        console.log(res);
+    }
+    catch{}
+}
+
+async function main(){
+    // 0355523456
+    while(true){
+        await btnUPonclick();
+    }
+}

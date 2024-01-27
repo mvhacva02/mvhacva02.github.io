@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STUDY</title>
+    <style>
+        @font-face {
+            font-family: font-en;
+            src: url(font-en.woff2);
+        }
+        @font-face {
+            font-family: font-vi;
+            src: url(font-vi.woff2);
+        }
+        *{
+            font-family: font-en, font-vi;
+        }
+        body{
+            padding: 0 20px;
+        }
+        .box-question{
+            border: 2px solid rgb(175, 175, 175);
+            border-radius: 16px;
+            padding: 5px;
+            color: rgb(75, 75, 75);
+            font-size: 24px;
+        }
+        .box-answer{
+            outline: none;
+            border: none;
+            border-bottom: 2px solid rgb(175, 175, 175);
+            padding: 5px;
+            color: rgb(75, 75, 75);
+            font-size: 24px;
+        }
+        .space{
+            font-size: 24px;
+        }
+        #box_answer>*{
+            margin-bottom: 20px;
+        }
+        td{
+            font-size: 24px;
+        }
+        
+    </style>
+    <style>
+        .bottom{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        .bg-success{background-color: rgb(215, 255, 184)}
+        .bg-danger{background-color: rgb(255, 223, 224)}
+        .text-success{color: rgb(88, 167, 0)}
+        .text-danger{color: rgb(234, 43, 43)}
+        .p-0{padding: 0px}
+        .p-1{padding: 4px}
+        .p-2{padding: 8px}
+        .p-3{padding: 12px}
+        .p-4{padding: 16px}
+        .p-5{padding: 20px}
+        .mb-2{margin-bottom: 8px}
+        .mb-5{margin-bottom: 20px}
+        .mt-0{margin-top: 0}
+        .mt-5{margin-top: 20px}
+
+        .fs-4{
+            font-weight: 500;
+        }
+        .btn-success{
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            min-width: 150px;
+            line-height: 24px;
+
+            background: rgb(58, 131, 1);
+            padding: 0;
+            cursor: pointer;
+            outline-offset: 4px;
+            width: 100%;
+        }
+        .btn-success > span {
+            display: block;
+            padding: 12px 42px;
+            border-radius: 12px;
+            background: rgb(88,204,2);
+            color: white;
+            transform: translateY(-6px);
+        }
+        .btn-success:active > span {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger{
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            min-width: 150px;
+            line-height: 24px;
+
+            background: rgb(234,43,43);
+            padding: 0;
+            cursor: pointer;
+            outline-offset: 4px;
+            width: 100%;
+        }
+        .btn-danger > span {
+            display: block;
+            padding: 12px 42px;
+            border-radius: 12px;
+            background: rgb(255,75,75);
+            color: white;
+            transform: translateY(-6px);
+        }
+        .btn-danger:active > span {
+            transform: translateY(-2px);
+        }
+
+        .hide{display: none}
+
+      </style>
+</head>
+<body>
+    <h1 class="title">Cách học ngôn ngữ miễn phí, vui nhộn và hiệu quả!</h1>
+    <h1 id="num_dahoc" class="title">Đã học 0/120 từ</h1>
+    <h1 id="num_dahoctrongngay" class="title">Hôm nay đã học 0</h1>
+    <br>
+    <div class="">
+        <div class="challenge-header">
+            <h1>Các từ mới</h1>
+        </div>
+        <table>
+            <tr id="row1">
+                <td class="box-question">1</td>
+                <td>: 2</td>
+            </tr>
+            <tr id="row2">
+                <td class="box-question">3</td>
+                <td>: 4</td>
+            </tr>
+            <tr id="row3">
+                <td class="box-question">5</td>
+                <td>: 6</td>
+            </tr>
+        </table>
+    </div>
+    <div class="bottom">
+        <div class="p-5">
+            <h2 class="text-success mb-2 mt-0 hide"></h2>
+            <div class="text-success hide"></div>
+            <button class="btn-success mt-5" id="btn_send_answer"><span>Bắt đầu</span></button>
+        </div>
+    </div>
+    <br><br><br>
+    <a href="index.html">Ôn lại</a>
+
+    <script src="load.js"></script>
+    <script>
+        function get_learned_words(){
+            // [{...}, {...}]
+            // {en: "EN", vi: "VI", time: 0.1}
+            return JSON.parse(localStorage?.learned_words ?? '[]');
+        }
+        function set_learned_words(obj){
+            localStorage.setItem("learned_words", JSON.stringify(obj));
+        }
+        
+        btn_send_answer.onclick = function(){
+            document.querySelector(".bottom>div>button span").innerHTML = "Tiếp tục";
+            play_sound(true);
+            next_word();
+            update_number_wrord();
+        }
+
+        var new_learned_words = [];
+        function next_word(){
+            if(new_learned_words.length > 0){
+                set_learned_words([...get_learned_words(), ...new_learned_words])
+            }
+            new_learned_words = create_new_word(3);
+            new_learned_words.forEach((obj, index)=>{
+                const [ele_en, ele_vi] = document.querySelectorAll(`#row${index+1}>td`);
+                ele_en.innerHTML = obj.en;
+                ele_vi.innerHTML = ": " + obj.vi;
+            })
+        }
+        function create_new_word(length = 1){
+            // Những từ đã học
+            const learned_words = get_learned_words().map(item=>item.en);
+
+            // Lọc những từ chưa học
+            const word_en_not_learned = Object.keys(data).filter(k => !learned_words.includes(k));
+
+            var new_words = [];
+            for(let i=0; i<Math.min(length, word_en_not_learned.length); i++){
+                const key_random = word_en_not_learned[Math.floor(Math.random()*word_en_not_learned.length)];
+
+                // Nếu trùng thì lấy cái khác
+                if(new_words.some(item=>item.en == key_random)){ i--; continue; }
+                const word_obj = {
+                    en: key_random,
+                    vi: data[key_random],
+                    time: Date.now(),
+                    right_answer: 0,
+                    wrong_answer: 0,
+                }
+                new_words.push(word_obj);
+            }
+            return new_words;
+        }
+        function update_number_wrord(){
+            const learned_words = get_learned_words();
+            const local_time = Date.now();
+            const learned_words_inday = learned_words.filter(obj=>{
+                return local_time - obj.time < 1000 * 60 * 60 * 24 && (new Date(obj.time)).getDay() == (new Date(local_time)).getDay();
+            });
+            num_dahoc.innerHTML = `Đã học ${learned_words.length}/${Object.keys(data).length} từ`;
+            num_dahoctrongngay.innerHTML = "Hôm nay đã học " + learned_words_inday.length;
+        }
+        update_number_wrord();
+    </script>
+</body>
+</html>

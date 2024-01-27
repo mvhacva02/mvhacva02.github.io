@@ -1204,3 +1204,13 @@ const data = raw_text.split('\n').slice(1).reduce((obj, text) => {
     obj[en] = vi;
     return obj
 }, {})
+
+
+// Tạo âm thanh
+const sound_true = document.createElement("audio");
+sound_true.src = 'audio/true.mp3';
+const sound_false = document.createElement("audio");
+sound_false.src = 'audio/false.mp3';
+function play_sound(sound = true){
+    (sound?sound_true:sound_false).play();
+}
